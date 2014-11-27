@@ -1,0 +1,25 @@
+{
+  "folders": [
+    {
+      "path": ".",
+      "file_exclude_patterns": [
+        "*.pdf",              // Specification
+        "*.sublime-project",  // Sublime project file
+        "group.txt",          // Group info file (just our usernames)
+        "soda_*",             // Given executables
+        "soda",               // Built executable
+        "*.d",                // Build file
+        "*.o",                // Build file
+        ".*"                  // Hidden files (mainly just .gitignore)
+      ],
+      "follow_symlinks": true
+    }
+  ],
+  "settings": {
+    "ensure_newline_at_eof_on_save": true,
+    "tab_size": 4,
+    "translate_tabs_to_spaces": true,
+    "trim_automatic_white_space": false,
+    "trim_trailing_white_space_on_save": true
+  }
+}
