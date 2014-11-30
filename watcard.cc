@@ -3,16 +3,16 @@
     WATCard::WATCard( const WATCard & ) {}           // prevent copying
     WATCard::WATCard &operator=( const WATCard & ) {}
  
-    WATCard(): balance(0) {}
+    WATCard(): _balance(0) {}
 	
     void WATCard::deposit( unsigned int amount ) {
-		balance += amount;
+		_balance += amount;
 	}
 	
     void WATCard::withdraw( unsigned int amount ) {
-		balance -= amount;
+		_balance -= amount;
 	}
 	
     unsigned int WATCard::getBalance() {
-		return balance;
+		return _balance;
 	}

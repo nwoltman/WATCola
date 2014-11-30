@@ -2,7 +2,7 @@
 #define WATCARD_H
 
 class WATCard {
-	unsigned int balance; // no such thing as negative balance
+	unsigned int _balance; // no such thing as negative balance
 	
     WATCard( const WATCard & );            // prevent copying
     WATCard &operator=( const WATCard & );
