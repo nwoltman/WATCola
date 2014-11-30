@@ -1,6 +1,8 @@
 #ifndef WATCARD_H
 #define WATCARD_H
 
+#include "uFuture.h"
+
 class WATCard {
 	unsigned int _balance; // no such thing as negative balance
 	
