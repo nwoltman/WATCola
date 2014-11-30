@@ -4,6 +4,7 @@
 using namespace std;
 #include "config.h"
 #include "mprng.h"
+#include "printer.h"
 
 MPRNG g_mprng;  // Initialize the global MPRNG
 
@@ -29,7 +30,7 @@ void printUsageAndExit(char *name) {
 
 
 void uMain::main() {
-    ConfigParms configParms;
+    ConfigParms cparms;
     unsigned int seed = getpid();
 
     switch ( argc ) {
@@ -37,10 +38,10 @@ void uMain::main() {
         if ( ! isPosInt( argv[2] ) ) printUsageAndExit( argv[0] );
         seed = atoll( argv[2] );
       case 2:
-        processConfigFile( argv[1], configParms );       // Parse the specified config file
+        processConfigFile( argv[1], cparms );            // Parse the specified config file
         break;
       case 1:
-        processConfigFile( "soda.config", configParms ); // Parse the default config file
+        processConfigFile( "soda.config", cparms );      // Parse the default config file
         break;
       default:
         printUsageAndExit( argv[0] );
@@ -48,4 +49,5 @@ void uMain::main() {
 
     g_mprng.seed( seed );                                // Seed the MPRNG
 
+    Printer printer( cparms.numStudents, cparms.numVendingMachines, cparms.numCouriers );
 }
