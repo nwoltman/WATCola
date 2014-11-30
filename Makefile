@@ -2,7 +2,7 @@ CXX = u++	# compiler
 CXXFLAGS = -g -multi -Wall -Wno-unused-label -MMD ${OPT} # compiler flags
 MAKEFILE_NAME = ${firstword ${MAKEFILE_LIST}}	# makefile name
 
-OBJECTS = main.o config.o watcard.o bank.o parent.o printer.o
+OBJECTS = main.o config.o watcard.o bank.o printer.o parent.o bottling_plant.o
 EXEC = soda							# executable name
 DEPENDS = ${OBJECTS:.o=.d}			# substitute ".o" with ".d"
 
