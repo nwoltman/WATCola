@@ -5,6 +5,7 @@
       "file_exclude_patterns": [
         "*.pdf",              // Specification
         "*.sublime-project",  // Sublime project file
+        "*.md",               // Markdown files (mainly just the README)
         "group.txt",          // Group info file (just our usernames)
         "soda_*",             // Given executables
         "soda",               // Built executable
