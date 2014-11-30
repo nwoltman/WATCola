@@ -2,11 +2,11 @@
 #define BANK_H
 
 #include <map>
-#include <pair>
+#include <utility>
 
 _Monitor Bank {
 	std::map<unsigned int, unsigned int> _accounts; // <unsigned int id, unsigned int balance>
-	_numStudents; // not really necessary, used for error checking instead of calling _accounts.size()
+	unsigned int _numStudents; // not really necessary, used for error checking instead of calling _accounts.size()
 	
   public:
     Bank( unsigned int numStudents );

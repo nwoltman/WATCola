@@ -3,7 +3,7 @@
 using namespace std;
 
 Bank::Bank( unsigned int numStudents ) : _numStudents(numStudents) {
-	for (int i = 0; i < numStudents; i++) {	
+	for (unsigned int i = 0; i < numStudents; i++) {	
 		_accounts.insert( pair<unsigned int, unsigned int>(i,0) ); // initialize all student accounts with balance of 0
 	}
 }
