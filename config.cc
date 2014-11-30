@@ -68,7 +68,7 @@ void processConfigFile( const char *configFile, ConfigParms &cparms ) {
 	} // if
     } catch( uFile::Failure ) {
         cerr << "Error: could not open input file \"" << configFile << "\"" << endl;
-        exit( EXIT_FAILURE );    
+        exit( EXIT_FAILURE );
     } // try
 } // processConfigFile
 

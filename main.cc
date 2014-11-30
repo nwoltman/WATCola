@@ -5,6 +5,8 @@ using namespace std;
 #include "config.h"
 #include "mprng.h"
 
+MPRNG g_mprng;  // Initialize the global MPRNG
+
 
 // Determines if a char array is made up of only characters that form a positive integer
 bool isPosInt( char *c ) {
@@ -24,6 +26,7 @@ void printUsageAndExit(char *name) {
     cout << "Usage: " << name << " [ config-file [ random-seed (> 0) ] ]" << endl;
     exit( EXIT_FAILURE );
 }
+
 
 void uMain::main() {
     ConfigParms configParms;
