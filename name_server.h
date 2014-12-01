@@ -6,6 +6,7 @@
 
 
 _Task NameServer {
+    enum States { Starting = 'S', Register = 'R', NewMachine = 'N', Finished = 'F' };
     Printer &_printer;
     unsigned int _numVendingMachines;
     unsigned int _numStudents;

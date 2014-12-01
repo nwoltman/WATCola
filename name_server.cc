@@ -14,11 +14,6 @@ NameServer::NameServer( Printer &prt, unsigned int numVendingMachines, unsigned 
 }
 
 NameServer::~NameServer() {
-    // TODO: Remove this if this is not where we should be deleting individual vending machines
-    for ( unsigned int i = 0; i < _numVendingMachines; i += 1 ) {
-        delete _vendingMachines[i];
-    }
-
     delete[] _vendingMachines;
     delete[] _studentMachineIdMap;
 }
@@ -38,8 +33,11 @@ VendingMachine **NameServer::getMachineList() {
 }
 
 void NameServer::main() {
+    _printer.print( Printer::NameServer, NameServer::Starting );  // Starting task
+
     for ( unsigned int i = 0; i < _numVendingMachines; i += 1 ) { // Wait until all machines are registered
         _Accept( VMregister );                                    // Block until someone calls VMregister
+        _printer.print( Printer::NameServer, (char)NameServer::Register, _machineToRegister->getId() );
         _vendingMachines[i] = _machineToRegister;
     }
 
@@ -48,8 +46,12 @@ void NameServer::main() {
             break;
         } or _Accept( getMachine ) {                              // Update the student's vending machine ID
             unsigned int machineId = _studentMachineIdMap[_studentId];
+            // Print the vending machine the student just got
+            _printer.print( Printer::NameServer, (char)NameServer::NewMachine, _studentId, machineId );
+            // Round-robin to the next vending machine
             _studentMachineIdMap[_studentId] = (machineId + 1) % _numVendingMachines;
-        } or _Accept( getMachineList ) {                          // Nothing specific to do for this one
         }
     }
+
+    _printer.print( Printer::NameServer, NameServer::Finished );  // Finished task
 }
