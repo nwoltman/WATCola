@@ -23,7 +23,7 @@ _Task VendingMachine {
 	
     void main();
     enum State {
-        Starting = 'S', Generating = 'G', PickedUp = 'P', Finished = 'F'
+        Starting = 'S', StartReloading = 'r', CompleteReloading = 'R', SodaBought = 'B', Finished = 'F'
     };
   public:
     enum Flavours { BlackCherry = 0, CreamSoda = 1, RootBeer = 2, Lime = 3, NUM_FLAVOURS = 4};             // flavours of soda
