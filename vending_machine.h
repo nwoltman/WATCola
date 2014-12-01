@@ -12,21 +12,21 @@ _Task VendingMachine {
 	unsigned int _id;
 	unsigned int _sodaCost;
 	unsigned int _maxStockPerFlavour;
-	
+
 	WATCard *_card;
-	
-	
+
+
 	uCondition _buyBench;
 	bool _outOfStock;
 	bool _insufficientFunds;
 	bool _restocking;
-	
+
     void main();
     enum State {
         Starting = 'S', StartReloading = 'r', CompleteReloading = 'R', SodaBought = 'B', Finished = 'F'
     };
   public:
-    enum Flavours { BlackCherry = 0, CreamSoda = 1, RootBeer = 2, Lime = 3, NUM_FLAVOURS = 4};             // flavours of soda
+    enum Flavours { BlackCherry, CreamSoda, RootBeer, Lime, NumFlavours }; // flavours of soda
     _Event Funds {};                       // insufficient funds
     _Event Stock {};                       // out of stock for particular flavour
     VendingMachine( Printer &prt, NameServer &nameServer, unsigned int id, unsigned int sodaCost,
@@ -36,10 +36,10 @@ _Task VendingMachine {
     void restocked();
     _Nomutex unsigned int cost();
     _Nomutex unsigned int getId();
-    
+
   private:
 	Flavours _requestedFlavour;
-	unsigned int _stock[ NUM_FLAVOURS ]; // 0 => BlackCherry, 1 => CreamSoda, 2 => RootBeer, 3 => Lime
+	unsigned int _stock[ NumFlavours ]; // 0 => BlackCherry, 1 => CreamSoda, 2 => RootBeer, 3 => Lime
 };
 
 #endif

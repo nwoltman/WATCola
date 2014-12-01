@@ -3,7 +3,7 @@
 
 #include "printer.h"
 #include "name_server.h"
-#include "vending_machine.h" // for NUM_FLAVOURS
+#include "vending_machine.h" // for NumFlavours
 
 _Task BottlingPlant {
 	Printer &_prt;
@@ -12,13 +12,13 @@ _Task BottlingPlant {
 	unsigned int _maxShippedPerFlavour;
 	unsigned int _maxStockPerFlavour;
 	unsigned int _timeBetweenShipments;
-	unsigned int _productionRun[VendingMachine::NUM_FLAVOURS];
+	unsigned int _productionRun[VendingMachine::NumFlavours];
 	bool _closingDown;
-	
+
 	enum State {
         Starting = 'S', Generating = 'G', PickedUp = 'P', Finished = 'F'
     };
-	
+
     void main();
   public:
     _Event Shutdown {};                    // shutdown plant
