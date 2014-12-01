@@ -5,9 +5,9 @@ VendingMachine::VendingMachine( Printer &prt, NameServer &nameServer, unsigned i
 								unsigned int maxStockPerFlavour ) : _prt( prt ), _nameServer( nameServer ), 
 								_id( id ), _sodaCost( sodaCost ), _maxStockPerFlavour( maxStockPerFlavour )
 {
-	_prt.print(Printer::VendingMachine, VendingMachine::Starting);
+	_prt.print(Printer::Vending, VendingMachine::Starting);
 	_nameServer.VMregister(this);			// register with name server
-	for (int i = 0; i < NUM_FLAVOURS; i++) // initally stock is empty
+	for (int i = 0; i < VendingMachine::NUM_FLAVOURS; i++) // initally stock is empty
 			_stock[i] = 0; 
 	_outOfStock = false;
 	_insufficientFunds = false;
@@ -20,11 +20,11 @@ void VendingMachine::main() {
 		_Accept ( ~VendingMachine ) {
 			break;
 		} or _When (!_restocking) _Accept( buy ) {
-			_insufficientFunds = ( _card.getBalance() < _sodaCost ) ? true : false;  // check there's enough money
-			_outOfStock  = ( stock[_requestedFlavour] == 0 ) ? true : false; // check we have it in stock
+			_insufficientFunds = ( _card->getBalance() < _sodaCost ) ? true : false;  // check there's enough money
+			_outOfStock  = ( _stock[_requestedFlavour] == 0 ) ? true : false; // check we have it in stock
 				
 			if ( !_insufficientFunds && !_outOfStock){ // it is bought, withdraw money and give pop
-				_card.withdraw( _sodaCost );
+				_card->withdraw( _sodaCost );
 				_stock[_requestedFlavour]--;
 			}
 			
@@ -35,7 +35,7 @@ void VendingMachine::main() {
 }
  
 void VendingMachine::buy( Flavours flavour, WATCard &card ) {
-	_card = card;
+	_card = &card;
 	_requestedFlavour = flavour;
 	
 	_buyBench.wait(); // pass it off to the main

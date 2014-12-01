@@ -4,7 +4,7 @@
 NameServer::NameServer( Printer &prt, unsigned int numVendingMachines, unsigned int numStudents )
     : _printer( prt ), _numVendingMachines( numVendingMachines ), _numStudents( numStudents )
 {
-    _vendingMachines = new *VendingMachine[numVendingMachines];
+    _vendingMachines = new VendingMachine*[numVendingMachines];
     _studentMachineIdMap = new unsigned int[numStudents];
 
     // Distribute students evenly among the vending machines
@@ -15,7 +15,7 @@ NameServer::NameServer( Printer &prt, unsigned int numVendingMachines, unsigned 
 
 NameServer::~NameServer() {
     // TODO: Remove this if this is not where we should be deleting individual vending machines
-    for ( unsigned int i = 0; i < _numVendingMachines ) {
+    for ( unsigned int i = 0; i < _numVendingMachines; i += 1 ) {
         delete _vendingMachines[i];
     }
 

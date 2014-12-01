@@ -4,8 +4,6 @@
 #include "printer.h"
 #include "watcard.h"
 
-#define NUM_FLAVOURS 4
-
 _Task NameServer;
 
 _Task VendingMachine {
@@ -14,9 +12,8 @@ _Task VendingMachine {
 	unsigned int _id;
 	unsigned int _sodaCost;
 	unsigned int _maxStockPerFlavour;
-	unsigned int _stock[NUM_FLAVOURS]; // 0 => BlackCherry, 1 => CreamSoda, 2 => RootBeer, 3 => Lime
 	
-	WATCard &_card;
+	WATCard *_card;
 	
 	
 	uCondition _buyBench;
@@ -29,7 +26,7 @@ _Task VendingMachine {
         Starting = 'S', Generating = 'G', PickedUp = 'P', Finished = 'F'
     };
   public:
-    enum Flavours { BlackCherry, CreamSoda, RootBeer, Lime };             // flavours of soda
+    enum Flavours { BlackCherry = 0, CreamSoda = 1, RootBeer = 2, Lime = 3, NUM_FLAVOURS = 4};             // flavours of soda
     _Event Funds {};                       // insufficient funds
     _Event Stock {};                       // out of stock for particular flavour
     VendingMachine( Printer &prt, NameServer &nameServer, unsigned int id, unsigned int sodaCost,
@@ -39,8 +36,10 @@ _Task VendingMachine {
     void restocked();
     _Nomutex unsigned int cost();
     _Nomutex unsigned int getId();
+    
   private:
 	Flavours _requestedFlavour;
+	unsigned int _stock[ NUM_FLAVOURS ]; // 0 => BlackCherry, 1 => CreamSoda, 2 => RootBeer, 3 => Lime
 };
 
 #endif
