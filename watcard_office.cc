@@ -19,9 +19,11 @@ void WATCardOffice::main() {
 		_Accept ( ~WATCardOffice ) {
 			break;
 		} or _Accept( create ) {
-			_jobs.push(_currentJob );
+			_jobs.push( _currentJob ); // add job to queue then let the couriers know
+			courierBench.signal();
 		} or _Accept( transfer ) {
 			_jobs.push( _currentJob );
+			courierBench.signal();
 		} 
 			
 	}
@@ -41,9 +43,7 @@ WATCard::FWATCard WATCardOffice::transfer( unsigned int sid, unsigned int amount
 }
 
 Job *WATCardOffice::requestWork() {
-	if ( _jobs.empty )
-		return NULL;   		// I'M SURE A BETTER WAY WILL BECOME OBVIOUS WHEN COURIER IS IMPLEMENTED
-	Job* requestedJob = _jobs.front();
+	Job* requestedJob = _jobs.front(); // should never be empty because of courierBench
 	_jobs.pop();
 	return requestedJob;
 }
@@ -54,3 +54,35 @@ WATCardOffice::Courier::Courier( unsigned int id, Printer &prt, Bank &bank, WATC
                                 _prt( prt ), _bank( bank ), _watOffice( watOffice ) {
 	
 }
+
+void WATCardOffice::Courier::main() {
+	
+	for ( ;; ) {
+		_Accept ( ~Courier ) {
+			break;
+		} _Else { // continue with the rest of the loop
+			
+			courierBench.wait(); // when unblocked there should be a job
+			
+			Job* newJob = requestWork();
+			
+			if (newJob->args._card == NULL) { //create
+				newJob->args._card == WATCard();
+			}
+			
+			_bank.withdraw(newJob->args._sid, newJob->args._amount);
+			newJob->args._card.deposit( newJob->args._sid, newJob->args._amount );
+			
+			if ( g_mprng(5) == 3 ) { // simulate 1 in 6 chance of losing card
+				delete newJob->newJob->args._card;
+				newJob->result.exception( new Lost() );
+			} else {
+				newJob->result.deliver( newJob->args._card );
+			}
+			
+			delete newJob;
+        }
+			
+	}
+}
+

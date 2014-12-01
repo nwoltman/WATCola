@@ -25,6 +25,11 @@ _Task WATCardOffice {
 		Printer &_prt;
 		Bank &_bank;
 		WATCardOffice &_watOffice;
+		void main();
+		
+		enum State {
+			Starting = 'S', TransferStart = 't', TransferComplete = 'T', Finished = 'F'
+		};
 	  public:
 		Courier( unsigned int id, Printer &prt, Bank &bank, WATCardOffice &watOffice );
 	};                 
@@ -35,6 +40,7 @@ _Task WATCardOffice {
 	Printer &_prt;
 	Bank &_bank;
 	unsigned int _numCouriers;
+	uCondition courierBench;
     void main();
     
     enum State {
