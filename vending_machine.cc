@@ -2,15 +2,16 @@
 #include "name_server.h"
 
 VendingMachine::VendingMachine( Printer &prt, NameServer &nameServer, unsigned int id, unsigned int sodaCost,
-								unsigned int maxStockPerFlavour ) : _prt( prt ), _nameServer( nameServer ),
-								_id( id ), _sodaCost( sodaCost ), _maxStockPerFlavour( maxStockPerFlavour )
+								unsigned int maxStockPerFlavour )
+	: _prt( prt ), _nameServer( nameServer ), _id( id ), _sodaCost( sodaCost ),
+	  _maxStockPerFlavour( maxStockPerFlavour )
 {
-	_prt.print(Printer::Vending, (char)VendingMachine::Starting, sodaCost);
+	_prt.print( Printer::Vending, id, (char)VendingMachine::Starting, sodaCost );
 
-	for (int i = 0; i < VendingMachine::NumFlavours; i++) // initally stock is empty
+	for ( int i = 0; i < VendingMachine::NumFlavours; i++ ) // initally stock is empty
 			_stock[i] = 0;
 
-	_nameServer.VMregister(this);			// register with name server
+	_nameServer.VMregister( this );			// register with name server
 	_outOfStock = false;
 	_insufficientFunds = false;
 	_restocking = false;
@@ -18,24 +19,24 @@ VendingMachine::VendingMachine( Printer &prt, NameServer &nameServer, unsigned i
 
 void VendingMachine::main() {
 	for ( ;; ) {
-
 		_Accept ( ~VendingMachine ) {
 			break;
-		} or _When (!_restocking) _Accept( buy ) {
-			_insufficientFunds = ( _card->getBalance() < _sodaCost ) ? true : false;  // check there's enough money
-			_outOfStock  = ( _stock[_requestedFlavour] == 0 ) ? true : false; // check we have it in stock
+		} or _When ( !_restocking ) _Accept( buy ) {
+			_insufficientFunds = _card->getBalance() < _sodaCost;  // check if the card has enough money
+			_outOfStock  = _stock[_requestedFlavour] == 0;         // check we have it in stock
 
-			if ( !_insufficientFunds && !_outOfStock){ // it is bought, withdraw money and give pop
+			if ( !_insufficientFunds && !_outOfStock ) {           // it is bought, withdraw money and give soda
 				_card->withdraw( _sodaCost );
 				_stock[_requestedFlavour]--;
-				_prt.print(Printer::Vending, VendingMachine::SodaBought, _requestedFlavour, _stock[_requestedFlavour]);
+                _prt.print( Printer::Vending, _id, (char)VendingMachine::SodaBought,
+                            _requestedFlavour, _stock[_requestedFlavour] );
 			}
 
 			_buyBench.signal();
 
 		}
 	}
-	_prt.print(Printer::Vending, VendingMachine::Finished);
+	_prt.print( Printer::Vending, _id, (char)VendingMachine::Finished );
 }
 
 void VendingMachine::buy( Flavours flavour, WATCard &card ) {
@@ -44,20 +45,19 @@ void VendingMachine::buy( Flavours flavour, WATCard &card ) {
 
 	_buyBench.wait(); // pass it off to the main
 
-	if (_insufficientFunds) throw Funds();
-	if (_outOfStock) throw Stock();
-
+	if ( _insufficientFunds ) throw Funds();
+	if ( _outOfStock ) throw Stock();
 }
 
 unsigned int *VendingMachine::inventory() {
 	_restocking = true;
-	_prt.print(Printer::Vending, VendingMachine::StartReloading);
+	_prt.print( Printer::Vending, _id, (char)VendingMachine::StartReloading );
 	return _stock;
 }
 
 void VendingMachine::restocked() {
 	_restocking = false;
-	_prt.print(Printer::Vending, VendingMachine::CompleteReloading);
+	_prt.print( Printer::Vending, _id, (char)VendingMachine::CompleteReloading );
 }
 
 _Nomutex unsigned int VendingMachine::cost() {
