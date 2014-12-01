@@ -4,7 +4,6 @@
 #include "watcard.h"
 #include "printer.h"
 #include "bank.h"
-#include <vector>
 #include <queue>
 
 _Task WATCardOffice {
@@ -34,6 +33,7 @@ _Task WATCardOffice {
 		Courier( unsigned int id, Printer &prt, Bank &bank, WATCardOffice &watOffice );
 	};                 
 	
+	Courier *_couriers;
 	std::vector<Courier*> _couriers;
 	std::queue<Job*> _jobs;
 	Job _currentJob;
@@ -50,6 +50,7 @@ _Task WATCardOffice {
   public:
     _Event Lost {};                        // lost WATCard
     WATCardOffice( Printer &prt, Bank &bank, unsigned int numCouriers );
+    ~WATCardOffice();
     WATCard::FWATCard create( unsigned int sid, unsigned int amount );
     WATCard::FWATCard transfer( unsigned int sid, unsigned int amount, WATCard *card );
     Job *requestWork();

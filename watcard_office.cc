@@ -6,9 +6,17 @@ using namespace std;
 WATCardOffice::WATCardOffice( Printer &prt, Bank &bank, unsigned int numCouriers ) : _prt( prt ), _bank( bank ), 
                              _numCouriers( numCouriers ) 
 {
+	_studentMachineIdMap = new Courier[numCouriers];
 	for ( unsigned int i = 0; i < _numCouriers; i++ ) {
-		couriers.push_back( new WATCardOffice::Courier( i, _prt, _bank, *this ) );
+		_couriers[i] = new WATCardOffice::Courier( i, _prt, _bank, *this );
 	}
+}
+
+WATCardOffice::~WATCardOffice() {
+	for ( unsigned int i = 0; i < _numCouriers; i++ ) {
+		_couriers[i];
+	}
+	delete[] _couriers;
 }
 
 void WATCardOffice::main() {
