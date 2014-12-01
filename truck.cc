@@ -1,4 +1,5 @@
 #include "truck.h"
+#include "mprng.h"
 #include "vending_machine.h"
 
 
@@ -10,7 +11,7 @@ Truck::Truck( Printer &prt, NameServer &nameServer, BottlingPlant &plant,
 unsigned int Truck::countSodas( const unsigned int flavours[] ) {
     unsigned int numSodas = 0;
     for ( unsigned int i = 0; VendingMachine::NumFlavours; i++ ) {
-        numSodas += cargo[i];
+        numSodas += flavours[i];
     }
     return numSodas;
 }
@@ -27,11 +28,11 @@ void Truck::main() {
 
     for ( ;; ) {
         try {
-            yield( 1, 10 );                                          // Get coffee at Tim Hortons
+            yield( g_mprng( 1, 10 ) );                               // Get coffee at Tim Hortons
             _plant.getShipment( cargo );                             // Pick up shipment of soda
 
             unsigned int shipmentSize = countSodas( cargo );
-            _printer.print( Printer::Truck, Truck::PickedUp, shipmentSize ); // Print picked up shipment
+            _printer.print( Printer::Truck, (char)Truck::PickedUp, shipmentSize ); // Print picked up shipment
             if ( shipmentSize == 0 ) continue;                       // If no soda was picked up, try again
         }
         catch ( BottlingPlant::Shutdown ) {
@@ -40,7 +41,7 @@ void Truck::main() {
 
         for ( unsigned int i = 0; i < _numVendingMachines; i++ ) {
             unsigned int machine = (firstMachine + i) % _numVendingMachines;
-            _printer.print( Printer::Truck, Truck::BeginDelivery, machine, countSodas( cargo ) ); // Begin delivery
+            _printer.print( Printer::Truck, (char)Truck::BeginDelivery, machine, countSodas( cargo ) ); // Begin
             unsigned int *inventory = vendingMachines[machine]->inventory();
             unsigned int numMissing = 0;                             // The number of sodas not replenished
 
@@ -60,11 +61,11 @@ void Truck::main() {
             }
 
             if ( numMissing > 0 ) {                                  // Print if machine wasn't fully restocked
-                _printer.print( Printer::Truck, Truck::UnsuccessfulFilling, machine, numMissing );
+                _printer.print( Printer::Truck, (char)Truck::UnsuccessfulFilling, machine, numMissing );
             }
 
             unsigned int numSodasLeft = countSodas( cargo );
-            _printer.print( Printer::Truck, Truck::EndDelivery, machine, numSodasLeft ); // End delivery
+            _printer.print( Printer::Truck, (char)Truck::EndDelivery, machine, numSodasLeft ); // End delivery
             if ( numSodasLeft == 0 ) break;                          // If cargo is empty, get more soda
         }
 
