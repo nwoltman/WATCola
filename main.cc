@@ -2,9 +2,15 @@
 #include <iostream>
 #include <fstream>
 using namespace std;
+#include "bank.h"
+#include "bottling_plant.h"
 #include "config.h"
 #include "mprng.h"
+#include "name_server.h"
+#include "parent.h"
 #include "printer.h"
+#include "student.h"
+#include "watcard_office.h"
 
 MPRNG g_mprng;  // Initialize the global MPRNG
 
@@ -50,4 +56,37 @@ void uMain::main() {
     g_mprng.seed( seed );                                // Seed the MPRNG
 
     Printer printer( cparms.numStudents, cparms.numVendingMachines, cparms.numCouriers );
+    { // Block forces printer to be deleted last
+        // Create the name server
+        NameServer nameServer( printer, cparms.numVendingMachines, cparms.numStudents );
+
+        // Create the vending machines
+        VendingMachine* vendingMachines[ cparms.numVendingMachines ];
+        for ( unsigned int i = 0; i < cparms.numVendingMachines; i += 1 ) {
+            vendingMachines[i] = new VendingMachine( printer, nameServer, i, cparms.sodaCost,
+                                                     cparms.maxStockPerFlavour );
+        }
+
+        // Create the bottling plant, bank, parent, and WATCard office
+        BottlingPlant plant( printer, nameServer, cparms.numVendingMachines, cparms.maxShippedPerFlavour,
+                             cparms.maxStockPerFlavour, cparms.timeBetweenShipments );
+        Bank bank( cparms.numStudents );
+        Parent parent( printer, bank, cparms.numStudents, cparms.parentalDelay );
+        WATCardOffice cardOffice( printer, bank, cparms.numCouriers );
+
+        // Create the students
+        Student* students[ cparms.numStudents ];
+        for ( unsigned int i = 0; i < cparms.numStudents; i += 1 ) {
+            students[i] = new Student( printer, nameServer, cardOffice, i, cparms.maxPurchases );
+        }
+        // Delete each student to end the task
+        for ( unsigned int i = 0; i < cparms.numStudents; i += 1 ) {
+            delete students[i];
+        }
+
+        // Delete each vending machine to end the task
+        for ( unsigned int i = 0; i < cparms.numVendingMachines; i += 1 ) {
+            delete vendingMachines[i];
+        }
+    }
 }
