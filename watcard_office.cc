@@ -64,13 +64,15 @@ WATCardOffice::Courier::Courier( unsigned int id, Printer &prt, Bank &bank, WATC
 }
 
 void WATCardOffice::Courier::main() {
-	
+	_prt.print( Printer::Courier, WATCardOffice::Courier::Starting );
 	for ( ;; ) {
 		_Accept ( ~Courier ) {
 			break;
 		} _Else { // continue with the rest of the loop
 			
 			courierBench.wait(); // when unblocked there should be a job
+			
+			_prt.print( Printer::Courier, WATCardOffice::Courier::TransferStart );
 			
 			Job* newJob = requestWork();
 			
@@ -88,9 +90,12 @@ void WATCardOffice::Courier::main() {
 				newJob->result.deliver( newJob->args._card );
 			}
 			
+			_prt.print( Printer::Courier, WATCardOffice::Courier::TransferComplete );
+			
 			delete newJob;
         }
 			
 	}
+	_prt.print( Printer::Courier, WATCardOffice::Courier::Finished );
 }
 
