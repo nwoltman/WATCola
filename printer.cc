@@ -18,7 +18,7 @@ void Printer::Data1::print( std::ostream &os, bool moreData ) {
 Printer::Data2::Data2( char s, int v1 ) : Data1( s ), value1( v1 ) { }
 
 void Printer::Data2::print( std::ostream &os, bool moreData ) {
-    os << state << ' ' << value1;
+    os << state << value1;
     if ( moreData ) os << '\t';
 }
 
@@ -26,7 +26,7 @@ void Printer::Data2::print( std::ostream &os, bool moreData ) {
 Printer::Data3::Data3( char s, int v1, int v2 ) : Data2( s, v1 ), value2( v2 ) { }
 
 void Printer::Data3::print( std::ostream &os, bool moreData ) {
-    os << state << ' ' << value1 << ' ' << value2;
+    os << state << value1 << ',' << value2;
     if ( moreData ) os << '\t';
 }
 
