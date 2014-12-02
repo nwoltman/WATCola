@@ -33,6 +33,7 @@ void WATCardOffice::main() {
 		} or _Accept( transfer ) {
 			_jobs.push( _currentJob );
 			_courierBench.signal();
+		} or _Accept( requestWork ) {  // must have this otherwise requestWork can't be called
 		}
 
 	}

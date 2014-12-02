@@ -50,6 +50,7 @@ void NameServer::main() {
             _printer.print( Printer::NameServer, (char)NameServer::NewMachine, _studentId, machineId );
             // Round-robin to the next vending machine
             _studentMachineIdMap[_studentId] = (machineId + 1) % _numVendingMachines;
+        } or _Accept( getMachineList ) {  // Must have this otherwise getMachineList can't be called
         }
     }
 
