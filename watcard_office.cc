@@ -41,11 +41,15 @@ void WATCardOffice::main() {
 WATCard::FWATCard WATCardOffice::create( unsigned int sid, unsigned int amount ) {
 	_currentJob = new Job(Args(sid, amount, NULL)); // this will only work is the _Accept( create ) is guaranteed to run right after
 	
+	_prt.print( Printer::WATCardOffice, WATCardOffice::CreateComplete, sid, amount );
+	
 	return _currentJob->result; 
 }
 
 WATCard::FWATCard WATCardOffice::transfer( unsigned int sid, unsigned int amount, WATCard *card ) {
 	_currentJob = new Job(Args(sid, amount, card));
+	
+	_prt.print( Printer::WATCardOffice, WATCardOffice::TransferComplete, sid, amount );
 	
 	return _currentJob->result;
 }
@@ -72,7 +76,7 @@ void WATCardOffice::Courier::main() {
 			
 			courierBench.wait(); // when unblocked there should be a job
 			
-			_prt.print( Printer::Courier, WATCardOffice::Courier::TransferStart );
+			_prt.print( Printer::Courier, WATCardOffice::Courier::TransferStart, newJob->args._sid, newJob->args._amount );
 			
 			Job* newJob = requestWork();
 			
@@ -90,7 +94,7 @@ void WATCardOffice::Courier::main() {
 				newJob->result.deliver( newJob->args._card );
 			}
 			
-			_prt.print( Printer::Courier, WATCardOffice::Courier::TransferComplete );
+			_prt.print( Printer::Courier, WATCardOffice::Courier::TransferComplete, newJob->args._sid, newJob->args._amount );
 			
 			delete newJob;
         }
