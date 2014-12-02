@@ -15,7 +15,7 @@ WATCardOffice::WATCardOffice( Printer &prt, Bank &bank, unsigned int numCouriers
 
 WATCardOffice::~WATCardOffice() {
 	for ( unsigned int i = 0; i < _numCouriers; i++ ) {
-		_couriers[i];
+		delete _couriers[i];
 	}
 	delete[] _couriers;
 }
@@ -86,7 +86,7 @@ void WATCardOffice::Courier::main() {
 			}
 			
 			_bank.withdraw(newJob->args._sid, newJob->args._amount);
-			newJob->args._card.deposit( newJob->args._sid, newJob->args._amount );
+			newJob->args._card->deposit( newJob->args._sid, newJob->args._amount );
 			
 			if ( g_mprng(5) == 3 ) { // simulate 1 in 6 chance of losing card
 				delete newJob->args._card;
