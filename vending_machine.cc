@@ -34,6 +34,8 @@ void VendingMachine::main() {
 
 			_buyBench.signal();
 
+		} or _Accept( inventory ) { // putting these here in case the functions can't properly be called without them
+		} or _Accept( restocked ) {
 		}
 	}
 	_prt.print( Printer::Vending, _id, (char)VendingMachine::Finished );
