@@ -10,7 +10,7 @@ Truck::Truck( Printer &prt, NameServer &nameServer, BottlingPlant &plant,
 
 unsigned int Truck::countSodas( const unsigned int flavours[] ) {
     unsigned int numSodas = 0;
-    for ( unsigned int i = 0; VendingMachine::NumFlavours; i++ ) {
+    for ( unsigned int i = 0; i < VendingMachine::NumFlavours; i++ ) {
         numSodas += flavours[i];
     }
     return numSodas;
