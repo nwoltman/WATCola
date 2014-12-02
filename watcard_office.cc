@@ -58,10 +58,12 @@ WATCard::FWATCard WATCardOffice::transfer( unsigned int sid, unsigned int amount
 }
 
 WATCardOffice::Job *WATCardOffice::requestWork() {
-	if (_jobs.empty()) _courierBench.wait();
-	
+	if ( _jobs.empty() ) _courierBench.wait();   // Wait until there is a job
+
 	Job* requestedJob = _jobs.front();
 	_jobs.pop();
+
+	_prt.print( Printer::WATCardOffice, WATCardOffice::RequestComplete );
 	return requestedJob;
 }
 
@@ -81,7 +83,7 @@ void WATCardOffice::Courier::main() {
 		}
 
 		Job* job = _watOffice.requestWork();
-		
+
 		_prt.print( Printer::Courier, (char)WATCardOffice::Courier::TransferStart, job->_sid, job->_amount );
 
 		_bank.withdraw( job->_sid, job->_amount);
