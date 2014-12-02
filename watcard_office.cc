@@ -29,10 +29,8 @@ void WATCardOffice::main() {
 			break;
 		} or _Accept( create ) {
 			_jobs.push( _currentJob ); // add job to queue then let the couriers know
-			_courierBench.signal();
 		} or _Accept( transfer ) {
 			_jobs.push( _currentJob );
-			_courierBench.signal();
 		}
 
 	}
@@ -58,7 +56,9 @@ WATCard::FWATCard WATCardOffice::transfer( unsigned int sid, unsigned int amount
 }
 
 WATCardOffice::Job *WATCardOffice::requestWork() {
-	Job* requestedJob = _jobs.front(); // should never be empty because of courierBench
+	if (_jobs.empty()) return NULL;
+	
+	Job* requestedJob = _jobs.front();
 	_jobs.pop();
 	return requestedJob;
 }
@@ -78,25 +78,25 @@ void WATCardOffice::Courier::main() {
 		} _Else { // continue with the rest of the loop
 		}
 
-		_watOffice._courierBench.wait(); // when unblocked there should be a job
+		Job* job;
+		if ((job =_watOffice.requestWork()) != NULL) {
 
-		Job* job = _watOffice.requestWork();
+			_prt.print( Printer::Courier, (char)WATCardOffice::Courier::TransferStart, job->_sid, job->_amount );
 
-		_prt.print( Printer::Courier, (char)WATCardOffice::Courier::TransferStart, job->_sid, job->_amount );
+			_bank.withdraw( job->_sid, job->_amount);
+			job->_card->deposit( job->_amount );
 
-		_bank.withdraw( job->_sid, job->_amount);
-		job->_card->deposit( job->_amount );
+			if ( g_mprng( 5 ) == 3 ) { // simulate 1 in 6 chance of losing card
+				delete job->_card;
+				job->result.exception( new Lost() );
+			} else {
+				job->result.delivery( job->_card );
+			}
 
-		if ( g_mprng( 5 ) == 3 ) { // simulate 1 in 6 chance of losing card
-			delete job->_card;
-			job->result.exception( new Lost() );
-		} else {
-			job->result.delivery( job->_card );
+			_prt.print( Printer::Courier, (char)WATCardOffice::Courier::TransferComplete, job->_sid, job->_amount );
+
+			delete job;
 		}
-
-		_prt.print( Printer::Courier, (char)WATCardOffice::Courier::TransferComplete, job->_sid, job->_amount );
-
-		delete job;
 	}
 	_prt.print( Printer::Courier, WATCardOffice::Courier::Finished );
 }
