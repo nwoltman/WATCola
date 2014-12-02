@@ -47,5 +47,7 @@ void Student::main() {
         }
     }
 
+    delete fcard();                                             // Student must delete their card
+
     _printer.print( Printer::Student, _id, (char)Student::Finished ); // Finished
 }
