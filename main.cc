@@ -57,7 +57,10 @@ void uMain::main() {
 
     Printer printer( cparms.numStudents, cparms.numVendingMachines, cparms.numCouriers );
     { // Block forces printer to be deleted last
-        // Create the name server
+        // Create the bank, parent, WATCard office, and name server
+        Bank bank( cparms.numStudents );
+        Parent parent( printer, bank, cparms.numStudents, cparms.parentalDelay );
+        WATCardOffice cardOffice( printer, bank, cparms.numCouriers );
         NameServer nameServer( printer, cparms.numVendingMachines, cparms.numStudents );
 
         // Create the vending machines
@@ -67,12 +70,9 @@ void uMain::main() {
                                                      cparms.maxStockPerFlavour );
         }
 
-        // Create the bottling plant, bank, parent, and WATCard office
+        // Create the bottling plant
         BottlingPlant plant( printer, nameServer, cparms.numVendingMachines, cparms.maxShippedPerFlavour,
                              cparms.maxStockPerFlavour, cparms.timeBetweenShipments );
-        Bank bank( cparms.numStudents );
-        Parent parent( printer, bank, cparms.numStudents, cparms.parentalDelay );
-        WATCardOffice cardOffice( printer, bank, cparms.numCouriers );
 
         // Create the students
         Student* students[ cparms.numStudents ];
