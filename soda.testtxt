@@ -1,0 +1,117 @@
+A6 (soda) TEST DOCUMENTATION
+=============================
+This sells soda to students.
+
+Test Information
+----------------
+1) Tests without any the input so the program runs with its default values.
+2) Tests with config file explicitly set and a random seed.
+3) Tests with config file explicitly set plus a specific seed.
+4) Tests an invalid config file.
+5) Tests an invalid seed.
+
+Test Console Output
+-------------------
+*HINT: The text looks like it does in the console if you set the tab size in your text editor to 8 spaces.
+
+
+  1	Script started on Mon Dec  1 23:52:15 EST 2014
+  2
+  3	TEST 1 (no input) RUN:
+  4	./soda
+  5	Parent	WATOff	Names	Truck	Plant	Stud0	Stud1	Mach0	Mach1	Mach2	Cour0
+  6	*******	*******	*******	*******	*******	*******	*******	*******	*******	*******	*******
+  7	S	S	S					S2	S2		S
+  8	D1,2		R0							S2
+  9	D1,1		R1
+ 10	D1,3	C0,5	R2		S	S0,1
+ 11	D2,2	C1,5	N0,0	S	G7	V0	S2,1
+ 12	Going on bench
+ 13	D1,2		N1,1				V1
+ 14	D0,3
+ 15	D2,1
+ 16	D2,3
+ 17	D1,2			P7
+ 18				d0,7				r
+ 19				U0,13
+ 20	D0,3			D0,0	P
+ 21	D0,1				G5
+ 22	D1,2			P5
+ 23				d1,5					r
+ 24				U1,15
+ 25	D0,1			D1,0	P
+ 26	D2,3				G6
+ 27	D2,1
+ 28	D1,2
+ 29	INFINITE LOOP
+ 30	TEST 1 COMPLETE.
+ 31
+ 32	TEST 2 (explicit config) RUN:
+ 33	./soda soda.config
+ 34	Parent	WATOff	Names	Truck	Plant	Stud0	Stud1	Mach0	Mach1	Mach2	Cour0
+ 35	*******	*******	*******	*******	*******	*******	*******	*******	*******	*******	*******
+ 36	S	S	S					S2	S2		S
+ 37	D1,2		R0							S2
+ 38	D1,1		R1
+ 39	D1,3	C0,5	R2		S	S0,1
+ 40	D2,2	C1,5	N0,0	S	G7	V0	S2,1
+ 41	Going on bench
+ 42	D1,2		N1,1				V1
+ 43	D0,3
+ 44	D2,1
+ 45	D2,3
+ 46	D1,2			P7
+ 47				d0,7				r
+ 48				U0,13
+ 49	D0,3			D0,0	P
+ 50	D0,1				G5
+ 51	D1,2			P5
+ 52				d1,5					r
+ 53				U1,15
+ 54	D0,1			D1,0	P
+ 55	D2,3				G6
+ 56	D2,1
+ 57	D1,2
+ 58	INFINITE LOOP
+ 59	TEST 2 COMPLETE.
+ 60
+ 61	TEST 3 (explicit config and seed) RUN:
+ 62	./soda soda.config 100
+ 63	Parent	WATOff	Names	Truck	Plant	Stud0	Stud1	Mach0	Mach1	Mach2	Cour0
+ 64	*******	*******	*******	*******	*******	*******	*******	*******	*******	*******	*******
+ 65	S	S	S					S2	S2		S
+ 66	D1,2		R0							S2
+ 67	D1,1		R1
+ 68	D1,3	C0,5	R2		S	S0,1
+ 69	D2,2	C1,5	N0,0	S	G7	V0	S2,1
+ 70	Going on bench
+ 71	D1,2		N1,1				V1
+ 72	D0,3
+ 73	D2,1
+ 74	D2,3
+ 75	D1,2			P7
+ 76				d0,7				r
+ 77				U0,13
+ 78	D0,3			D0,0	P
+ 79	D0,1				G5
+ 80	D1,2			P5
+ 81				d1,5					r
+ 82				U1,15
+ 83	D0,1			D1,0	P
+ 84	D2,3				G6
+ 85	D2,1
+ 86	D1,2
+ 87	INFINITE LOOP
+ 88	TEST 3 COMPLETE.
+ 89
+ 90	TEST 4 (bad config file) RUN:
+ 91	./soda xxx
+ 92	Error: could not open input file "xxx"
+ 93	TEST 4 COMPLETE.
+ 94
+ 95	TEST 5 (bad input seed) RUN:
+ 96	./soda soda.config a
+ 97	Usage: ./soda [ config-file [ random-seed (> 0) ] ]
+ 98	TEST 5 COMPLETE.
+ 99
+100	Script ended on Mon Dec  1 23:52:15 EST 2014
