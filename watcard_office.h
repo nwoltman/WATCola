@@ -7,18 +7,13 @@
 #include <queue>
 
 _Task WATCardOffice {
-    struct Args {
-        unsigned int _sid;
-        unsigned int _amount;
-        WATCard *_card;
-        Args( unsigned int sid, unsigned int amount, WATCard::FWATCard &card )
-            : _sid( sid ), _amount( amount ), _card( card ) {}
-    };
-
     struct Job {                           // marshalled arguments and return future
-        Args args;                         // call arguments
+        unsigned int _sid;                 // student ID
+        unsigned int _amount;              // amount to put on card
+        WATCard *_card;                    // pointer to student's card
         WATCard::FWATCard result;          // return future
-        Job( Args args ) : args( args ) {}
+        Job( unsigned int sid, unsigned int amount, WATCard *card )
+            : _sid( sid ), _amount( amount ), _card( card ) {}
     };
 
     _Task Courier { // communicates with bank
@@ -35,9 +30,9 @@ _Task WATCardOffice {
 		Courier( unsigned int id, Printer &prt, Bank &bank, WATCardOffice &watOffice );
 	};
 
-	Courier *_couriers;
+	Courier **_couriers;
 	std::queue<Job*> _jobs;
-	Job _currentJob;
+	Job *_currentJob;
 	Printer &_prt;
 	Bank &_bank;
 	unsigned int _numCouriers;
