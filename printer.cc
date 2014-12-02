@@ -137,20 +137,20 @@ void Printer::print( Kind kind, unsigned int lid, char state ) {
     } else {
         checkDataBuffer( kind, lid );                         // Check if the buffer needs flushed
         DataBuffer *db = (DataBuffer*)_buffer[kind];
-        db->insert( kind, new Data1( state ) );               // Add the data to the buffer
+        db->insert( lid, new Data1( state ) );                // Add the data to the buffer
     }
 }
 
 void Printer::print( Kind kind, unsigned int lid, char state, int value1 ) {
     checkDataBuffer( kind, lid );
     DataBuffer *db = (DataBuffer*)_buffer[kind];
-    db->insert( kind, new Data2( state, value1 ) );
+    db->insert( lid, new Data2( state, value1 ) );
 }
 
 void Printer::print( Kind kind, unsigned int lid, char state, int value1, int value2 ) {
     checkDataBuffer( kind, lid );
     DataBuffer *db = (DataBuffer*)_buffer[kind];
-    db->insert( kind, new Data3( state, value1, value2 ) );
+    db->insert( lid, new Data3( state, value1, value2 ) );
 }
 
 unsigned int Printer::getSizeOfKind( Kind kind ) {
