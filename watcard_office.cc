@@ -1,12 +1,13 @@
 #include "watcard_office.h"
-#include "MPRNG.h"
+#include "mprng.h"
+#include <uFuture.h>
 
 using namespace std;
 
 WATCardOffice::WATCardOffice( Printer &prt, Bank &bank, unsigned int numCouriers ) : _prt( prt ), _bank( bank ), 
                              _numCouriers( numCouriers ) 
 {
-	_studentMachineIdMap = new Courier[numCouriers];
+	_couriers = new Courier[numCouriers];
 	for ( unsigned int i = 0; i < _numCouriers; i++ ) {
 		_couriers[i] = new WATCardOffice::Courier( i, _prt, _bank, *this );
 	}
@@ -28,10 +29,10 @@ void WATCardOffice::main() {
 			break;
 		} or _Accept( create ) {
 			_jobs.push( _currentJob ); // add job to queue then let the couriers know
-			courierBench.signal();
+			_courierBench.signal();
 		} or _Accept( transfer ) {
 			_jobs.push( _currentJob );
-			courierBench.signal();
+			_courierBench.signal();
 		} 
 			
 	}
@@ -41,7 +42,7 @@ void WATCardOffice::main() {
 WATCard::FWATCard WATCardOffice::create( unsigned int sid, unsigned int amount ) {
 	_currentJob = new Job(Args(sid, amount, NULL)); // this will only work is the _Accept( create ) is guaranteed to run right after
 	
-	_prt.print( Printer::WATCardOffice, WATCardOffice::CreateComplete, sid, amount );
+	_prt.print( Printer::WATCardOffice, (char)WATCardOffice::CreateComplete, sid, amount );
 	
 	return _currentJob->result; 
 }
@@ -49,7 +50,7 @@ WATCard::FWATCard WATCardOffice::create( unsigned int sid, unsigned int amount )
 WATCard::FWATCard WATCardOffice::transfer( unsigned int sid, unsigned int amount, WATCard *card ) {
 	_currentJob = new Job(Args(sid, amount, card));
 	
-	_prt.print( Printer::WATCardOffice, WATCardOffice::TransferComplete, sid, amount );
+	_prt.print( Printer::WATCardOffice, (char)WATCardOffice::TransferComplete, sid, amount );
 	
 	return _currentJob->result;
 }
@@ -74,27 +75,27 @@ void WATCardOffice::Courier::main() {
 			break;
 		} _Else { // continue with the rest of the loop
 			
-			courierBench.wait(); // when unblocked there should be a job
-			
-			_prt.print( Printer::Courier, WATCardOffice::Courier::TransferStart, newJob->args._sid, newJob->args._amount );
+			_watOffice._courierBench.wait(); // when unblocked there should be a job
 			
 			Job* newJob = requestWork();
 			
+			_prt.print( Printer::Courier, (char)WATCardOffice::Courier::TransferStart, newJob->args._sid, newJob->args._amount );
+			
 			if (newJob->args._card == NULL) { //create
-				newJob->args._card == WATCard();
+				newJob->args._card == new WATCard();
 			}
 			
 			_bank.withdraw(newJob->args._sid, newJob->args._amount);
 			newJob->args._card.deposit( newJob->args._sid, newJob->args._amount );
 			
 			if ( g_mprng(5) == 3 ) { // simulate 1 in 6 chance of losing card
-				delete newJob->newJob->args._card;
+				delete newJob->args._card;
 				newJob->result.exception( new Lost() );
 			} else {
 				newJob->result.deliver( newJob->args._card );
 			}
 			
-			_prt.print( Printer::Courier, WATCardOffice::Courier::TransferComplete, newJob->args._sid, newJob->args._amount );
+			_prt.print( Printer::Courier, (char)WATCardOffice::Courier::TransferComplete, newJob->args._sid, newJob->args._amount );
 			
 			delete newJob;
         }
