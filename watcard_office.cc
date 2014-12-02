@@ -29,8 +29,10 @@ void WATCardOffice::main() {
 			break;
 		} or _Accept( create ) {
 			_jobs.push( _currentJob ); // add job to queue then let the couriers know
+			_courierBench.signal();
 		} or _Accept( transfer ) {
 			_jobs.push( _currentJob );
+			_courierBench.signal();
 		}
 
 	}
@@ -56,7 +58,7 @@ WATCard::FWATCard WATCardOffice::transfer( unsigned int sid, unsigned int amount
 }
 
 WATCardOffice::Job *WATCardOffice::requestWork() {
-	if (_jobs.empty()) return NULL;
+	if (_jobs.empty()) _courierBench.wait();
 	
 	Job* requestedJob = _jobs.front();
 	_jobs.pop();
@@ -78,25 +80,23 @@ void WATCardOffice::Courier::main() {
 		} _Else { // continue with the rest of the loop
 		}
 
-		Job* job;
-		if ((job =_watOffice.requestWork()) != NULL) {
+		Job* job = _watOffice.requestWork();
+		
+		_prt.print( Printer::Courier, (char)WATCardOffice::Courier::TransferStart, job->_sid, job->_amount );
 
-			_prt.print( Printer::Courier, (char)WATCardOffice::Courier::TransferStart, job->_sid, job->_amount );
+		_bank.withdraw( job->_sid, job->_amount);
+		job->_card->deposit( job->_amount );
 
-			_bank.withdraw( job->_sid, job->_amount);
-			job->_card->deposit( job->_amount );
-
-			if ( g_mprng( 5 ) == 3 ) { // simulate 1 in 6 chance of losing card
-				delete job->_card;
-				job->result.exception( new Lost() );
-			} else {
-				job->result.delivery( job->_card );
-			}
-
-			_prt.print( Printer::Courier, (char)WATCardOffice::Courier::TransferComplete, job->_sid, job->_amount );
-
-			delete job;
+		if ( g_mprng( 5 ) == 3 ) { // simulate 1 in 6 chance of losing card
+			delete job->_card;
+			job->result.exception( new Lost() );
+		} else {
+			job->result.delivery( job->_card );
 		}
+
+		_prt.print( Printer::Courier, (char)WATCardOffice::Courier::TransferComplete, job->_sid, job->_amount );
+
+		delete job;
 	}
 	_prt.print( Printer::Courier, WATCardOffice::Courier::Finished );
 }

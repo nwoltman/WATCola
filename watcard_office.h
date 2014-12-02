@@ -36,6 +36,7 @@ _Task WATCardOffice {
 	Printer &_prt;
 	Bank &_bank;
 	unsigned int _numCouriers;
+	uCondition _courierBench;
     void main();
 
     enum State {
