@@ -39,10 +39,12 @@ void Truck::main() {
             break;
         }
 
-        for ( unsigned int i = 0; i < _numVendingMachines; i++ ) {
-            unsigned int machine = (firstMachine + i) % _numVendingMachines;
-            _printer.print( Printer::Truck, (char)Truck::BeginDelivery, machine, countSodas( cargo ) ); // Begin
-            unsigned int *inventory = vendingMachines[machine]->inventory();
+        for ( unsigned int i = 0; i < _numVendingMachines; i++ ) {   // Fill each vending machine
+            unsigned int machineId = (firstMachine + i) % _numVendingMachines;
+            _printer.print( Printer::Truck, (char)Truck::BeginDelivery, machineId, countSodas( cargo ) ); // Begin
+
+            VendingMachine *machine = vendingMachines[machineId];
+            unsigned int *inventory = machine->inventory();
             unsigned int numMissing = 0;                             // The number of sodas not replenished
 
             for ( unsigned int i = 0; i < VendingMachine::NumFlavours; i++ ) { // Fill each flavour
@@ -61,11 +63,13 @@ void Truck::main() {
             }
 
             if ( numMissing > 0 ) {                                  // Print if machine wasn't fully restocked
-                _printer.print( Printer::Truck, (char)Truck::UnsuccessfulFilling, machine, numMissing );
+                _printer.print( Printer::Truck, (char)Truck::UnsuccessfulFilling, machineId, numMissing );
             }
 
+            machine->restocked();                                    // Restocking the machine complete
+
             unsigned int numSodasLeft = countSodas( cargo );
-            _printer.print( Printer::Truck, (char)Truck::EndDelivery, machine, numSodasLeft ); // End delivery
+            _printer.print( Printer::Truck, (char)Truck::EndDelivery, machineId, numSodasLeft ); // End delivery
             if ( numSodasLeft == 0 ) break;                          // If cargo is empty, get more soda
         }
 
