@@ -1,89 +1,77 @@
 #include "watcard_office.h"
 #include "mprng.h"
 #include <uFuture.h>
-
 using namespace std;
 
-WATCardOffice::WATCardOffice( Printer &prt, Bank &bank, unsigned int numCouriers )
-	: _prt( prt ), _bank( bank ), _numCouriers( numCouriers )
-{
-	_couriers = new WATCardOffice::Courier*[numCouriers];
-	for ( unsigned int i = 0; i < numCouriers; i++ ) {
-		_couriers[i] = new WATCardOffice::Courier( i, _prt, _bank, *this );
-	}
-}
 
-WATCardOffice::~WATCardOffice() {
-	for ( unsigned int i = 0; i < _numCouriers; i++ ) {
-		delete _couriers[i];
-	}
-	delete[] _couriers;
-}
+WATCardOffice::WATCardOffice( Printer &prt, Bank &bank, unsigned int numCouriers )
+	: _prt( prt ), _bank( bank ), _numCouriers( numCouriers ) { }
+
+WATCardOffice::~WATCardOffice() { }
 
 void WATCardOffice::main() {
 	 _prt.print( Printer::WATCardOffice, WATCardOffice::Starting );
 
-	for ( ;; ) {
+	 // Create the couriers
+	WATCardOffice::Courier *couriers[_numCouriers];
+	for ( unsigned int i = 0; i < _numCouriers; i++ ) {
+		couriers[i] = new WATCardOffice::Courier( i, _prt, _bank, *this );
+	}
 
+    // Main loop
+	for ( ;; ) {
 		_Accept ( ~WATCardOffice ) {
 			break;
-		} or _Accept( create ) {
-			_jobs.push( _currentJob ); // add job to queue then let the couriers know
-			_courierBench.signal();
-		} or _Accept( transfer ) {
+		} or _Accept( create, transfer ) {
 			_jobs.push( _currentJob );
-			_courierBench.signal();
-		} or _Accept( requestWork ) {  // must have this otherwise requestWork can't be called
+		} or _When( _jobs.size() > 0 ) _Accept( requestWork ) {
+			_jobs.pop();
 		}
-
 	}
+
+	for ( unsigned int i = 0; i < _numCouriers; i++ ) { // Give the couriers null jobs so that they will finish
+		_jobs.push( NULL );
+	}
+	while ( _jobs.size() > 0 ) {                        // Wait until all the couriers are done
+		_Accept( requestWork );
+	}
+	for ( unsigned int i = 0; i < _numCouriers; i++ ) { // Delete the couriers
+		delete couriers[i];
+	}
+
 	_prt.print( Printer::WATCardOffice, WATCardOffice::Finished );
 }
 
 WATCard::FWATCard WATCardOffice::create( unsigned int sid, unsigned int amount ) {
-	WATCard *card = new WATCard(); // create a new WATCard for the student
-	_currentJob = new WATCardOffice::Job( sid, amount, card );
-	// this will only work if the _Accept( create ) is guaranteed to run right after
-
+	_currentJob = new WATCardOffice::Job( sid, amount, new WATCard() );
 	_prt.print( Printer::WATCardOffice, (char)WATCardOffice::CreateComplete, sid, amount );
-
 	return _currentJob->result;
 }
 
 WATCard::FWATCard WATCardOffice::transfer( unsigned int sid, unsigned int amount, WATCard *card ) {
 	_currentJob = new WATCardOffice::Job( sid, amount, card );
-
 	_prt.print( Printer::WATCardOffice, (char)WATCardOffice::TransferComplete, sid, amount );
-
 	return _currentJob->result;
 }
 
 WATCardOffice::Job *WATCardOffice::requestWork() {
-	if ( _jobs.empty() ) _courierBench.wait();   // Wait until there is a job
-
-	Job* requestedJob = _jobs.front();
-	_jobs.pop();
-
 	_prt.print( Printer::WATCardOffice, WATCardOffice::RequestComplete );
-	return requestedJob;
+	return _jobs.front();
 }
 
-/*Courier Implementation*/
 
-WATCardOffice::Courier::Courier( unsigned int id, Printer &prt, Bank &bank, WATCardOffice &watOffice ) : _id( id ),
-                                _prt( prt ), _bank( bank ), _watOffice( watOffice ) {
+/* Courier Implementation */
 
-}
+WATCardOffice::Courier::Courier( unsigned int id, Printer &prt, Bank &bank, WATCardOffice &watOffice )
+	: _id( id ), _prt( prt ), _bank( bank ), _watOffice( watOffice ) { }
 
 void WATCardOffice::Courier::main() {
 	_prt.print( Printer::Courier, WATCardOffice::Courier::Starting );
-	for ( ;; ) {
-		_Accept ( ~Courier ) {
-			break;
-		} _Else { // continue with the rest of the loop
-		}
 
+	for ( ;; ) {
 		Job* job = _watOffice.requestWork();
+
+		if ( job == NULL ) break; // Getting a null job means there are no jobs left to do, so the courier can end
 
 		_prt.print( Printer::Courier, (char)WATCardOffice::Courier::TransferStart, job->_sid, job->_amount );
 
@@ -101,6 +89,7 @@ void WATCardOffice::Courier::main() {
 
 		delete job;
 	}
+
 	_prt.print( Printer::Courier, WATCardOffice::Courier::Finished );
 }
 

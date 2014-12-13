@@ -30,7 +30,6 @@ _Task WATCardOffice {
 		Courier( unsigned int id, Printer &prt, Bank &bank, WATCardOffice &watOffice );
 	};
 
-	Courier **_couriers;
 	std::queue<Job*> _jobs;
 	Job *_currentJob;
 	Printer &_prt;
