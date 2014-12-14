@@ -57,36 +57,39 @@ void uMain::main() {
 
     Printer printer( cparms.numStudents, cparms.numVendingMachines, cparms.numCouriers );
     { // Block forces printer to be deleted last
-        // Create the bank, parent, WATCard office, and name server
         Bank bank( cparms.numStudents );
-        Parent parent( printer, bank, cparms.numStudents, cparms.parentalDelay );
-        WATCardOffice cardOffice( printer, bank, cparms.numCouriers );
-        NameServer nameServer( printer, cparms.numVendingMachines, cparms.numStudents );
+        { // Block forces things that depend on the bank to be deleted first
+            Parent parent( printer, bank, cparms.numStudents, cparms.parentalDelay );
+            WATCardOffice cardOffice( printer, bank, cparms.numCouriers );
+            NameServer nameServer( printer, cparms.numVendingMachines, cparms.numStudents );
 
-        // Create the vending machines
-        VendingMachine* vendingMachines[ cparms.numVendingMachines ];
-        for ( unsigned int i = 0; i < cparms.numVendingMachines; i += 1 ) {
-            vendingMachines[i] = new VendingMachine( printer, nameServer, i, cparms.sodaCost,
-                                                     cparms.maxStockPerFlavour );
-        }
+            // Create the vending machines
+            VendingMachine* vendingMachines[ cparms.numVendingMachines ];
+            for ( unsigned int i = 0; i < cparms.numVendingMachines; i += 1 ) {
+                vendingMachines[i] = new VendingMachine( printer, nameServer, i, cparms.sodaCost,
+                                                         cparms.maxStockPerFlavour );
+            }
 
-        // Create the bottling plant
-        BottlingPlant plant( printer, nameServer, cparms.numVendingMachines, cparms.maxShippedPerFlavour,
-                             cparms.maxStockPerFlavour, cparms.timeBetweenShipments );
+            { // Block forces bottling plant to be deleted before the vending machines
+                // Create the bottling plant
+                BottlingPlant plant( printer, nameServer, cparms.numVendingMachines, cparms.maxShippedPerFlavour,
+                                     cparms.maxStockPerFlavour, cparms.timeBetweenShipments );
 
-        // Create the students
-        Student* students[ cparms.numStudents ];
-        for ( unsigned int i = 0; i < cparms.numStudents; i += 1 ) {
-            students[i] = new Student( printer, nameServer, cardOffice, i, cparms.maxPurchases );
-        }
-        // Delete each student to end the task
-        for ( unsigned int i = 0; i < cparms.numStudents; i += 1 ) {
-            delete students[i];
-        }
+                // Create the students
+                Student* students[ cparms.numStudents ];
+                for ( unsigned int i = 0; i < cparms.numStudents; i += 1 ) {
+                    students[i] = new Student( printer, nameServer, cardOffice, i, cparms.maxPurchases );
+                }
+                // Delete each student to end the task
+                for ( unsigned int i = 0; i < cparms.numStudents; i += 1 ) {
+                    delete students[i];
+                }
+            }
 
-        // Delete each vending machine to end the task
-        for ( unsigned int i = 0; i < cparms.numVendingMachines; i += 1 ) {
-            delete vendingMachines[i];
+            // Delete each vending machine to end the task
+            for ( unsigned int i = 0; i < cparms.numVendingMachines; i += 1 ) {
+                delete vendingMachines[i];
+            }
         }
     }
 }
