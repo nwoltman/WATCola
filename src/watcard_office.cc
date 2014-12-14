@@ -29,10 +29,9 @@ void WATCardOffice::main() {
 		}
 	}
 
-	for ( unsigned int i = 0; i < _numCouriers; i++ ) { // Give the couriers null jobs so that they will finish
-		_jobs.push( NULL );
-	}
-	while ( _jobs.size() > 0 ) {                        // Wait until all the couriers are done
+	// Give the couriers a null job and wait for them to finish
+	_jobs.push( NULL );
+	for ( unsigned int i = 0; i < _numCouriers; i++ ) {
 		_Accept( requestWork );
 	}
 	for ( unsigned int i = 0; i < _numCouriers; i++ ) { // Delete the couriers
