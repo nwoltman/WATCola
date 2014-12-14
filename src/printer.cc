@@ -90,7 +90,7 @@ void Printer::print( Kind kind, char state ) {
     if ( state == 'F' ) {
         flush();
         unsigned int numThings = 5 + _numStudents + _numVendingMachines + _numCouriers;
-        unsigned int findex = (unsigned int)kind;
+        unsigned int findex = kind == Printer::Courier ? numThings - 1 : (unsigned int)kind ;
         for ( unsigned int i = 0; i < numThings; i += 1 ) {
             if ( i < findex )
                 cout << "...\t";
@@ -99,6 +99,7 @@ void Printer::print( Kind kind, char state ) {
             else
                 cout << "\t...";
         }
+        cout << '\n';
     } else {
         checkDataBuffer( kind );                              // Flush if the buffer isn't empty
         _buffer[kind] = new Data1( state );                   // Add the data to the buffer
@@ -134,6 +135,7 @@ void Printer::print( Kind kind, unsigned int lid, char state ) {
             else
                 cout << "\t...";
         }
+        cout << '\n';
     } else {
         checkDataBuffer( kind, lid );                         // Check if the buffer needs flushed
         DataBuffer *db = (DataBuffer*)_buffer[kind];
