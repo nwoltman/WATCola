@@ -18,6 +18,7 @@ void Student::main() {
 
     _printer.print( Printer::Student, _id, (char)Student::Starting, favouriteFlavour, numToBuy ); // Starting
 
+    WATCard *card = NULL;                                       // Will be set to the actual card later
     WATCard::FWATCard fcard = _cardOffice.create( _id, 5 );     // Create a WATCard with a balance of $5
     VendingMachine *vmachine = _nameServer.getMachine( _id );   // Select an initial vending machine
     _printer.print( Printer::Student, _id, (char)Student::SelectedVM, vmachine->getId() );
@@ -27,27 +28,34 @@ void Student::main() {
 
         for ( ;; ) {                                            // Inifinite loop to try and buy a soda
             try {                                               // Try to buy a single soda
-                vmachine->buy( (VendingMachine::Flavours)favouriteFlavour, *fcard() );
-                numToBuy -= 1;                                  // Decrement the number of sodas left to buy
-                _printer.print( Printer::Student, _id, (char)Student::SelectedVM, numToBuy );
+                if ( card == NULL ) {                           // Retrieve the card if it is still in the future
+                    card = fcard();
+                }
+                vmachine->buy( (VendingMachine::Flavours)favouriteFlavour, *card );
                 break;                                          // Done buying one soda
             }
             catch ( WATCardOffice::Lost ) {                     // Handle lost card exception
                 _printer.print( Printer::Student, _id, (char)Student::LostCard );
                 fcard = _cardOffice.create( _id, 5 );           // Create a new WATCard with a balance of $5
+                card = NULL;
             }
             catch ( VendingMachine::Funds ) {                   // Handle insufficient funds exception
                 unsigned int amount = vmachine->cost() + 5;
-                _cardOffice.transfer( _id, amount, fcard() );   // Transfer more funds to card
+                _cardOffice.transfer( _id, amount, card );      // Transfer more funds to card
             }
             catch ( VendingMachine::Stock ) {                   // Handle out of stock exception
                 vmachine = _nameServer.getMachine( _id );       // Go to a new vending machine
                 _printer.print( Printer::Student, _id, (char)Student::SelectedVM, vmachine->getId() );
             }
         }
+                                                                // Successfully bought a soda
+        _printer.print( Printer::Student, _id, (char)Student::BoughtSoda, card->getBalance() );
+        numToBuy -= 1;                                          // Decrement the number of sodas left to buy
     }
 
-    delete fcard();                                             // Student must delete their card
+    if ( card != NULL ) {                                       // Student must delete their card
+        delete card;
+    }
 
     _printer.print( Printer::Student, _id, (char)Student::Finished ); // Finished
 }
