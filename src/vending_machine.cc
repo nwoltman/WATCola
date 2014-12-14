@@ -1,6 +1,7 @@
 #include "vending_machine.h"
 #include "name_server.h"
 
+
 VendingMachine::VendingMachine( Printer &prt, NameServer &nameServer, unsigned int id, unsigned int sodaCost,
 								unsigned int maxStockPerFlavour )
 	: _prt( prt ), _nameServer( nameServer ), _id( id ), _sodaCost( sodaCost ),
@@ -32,10 +33,9 @@ void VendingMachine::main() {
                             _requestedFlavour, _stock[_requestedFlavour] );
 			}
 
-			_buyBench.signal();
+			_buyBench.signalBlock();                               // Let the buy member finish
 
-		} or _Accept( inventory ) { // putting these here in case the functions can't properly be called without them
-		} or _Accept( restocked ) {
+		} or _Accept( inventory, restocked ) {
 		}
 	}
 	_prt.print( Printer::Vending, _id, (char)VendingMachine::Finished );
