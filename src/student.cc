@@ -41,7 +41,8 @@ void Student::main() {
             }
             catch ( VendingMachine::Funds ) {                   // Handle insufficient funds exception
                 unsigned int amount = vmachine->cost() + 5;
-                _cardOffice.transfer( _id, amount, card );      // Transfer more funds to card
+                fcard = _cardOffice.transfer( _id, amount, card ); // Transfer more funds to card
+                card = NULL;
             }
             catch ( VendingMachine::Stock ) {                   // Handle out of stock exception
                 vmachine = _nameServer.getMachine( _id );       // Go to a new vending machine
