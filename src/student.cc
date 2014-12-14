@@ -56,6 +56,12 @@ void Student::main() {
 
     if ( card != NULL ) {                                       // Student must delete their card
         delete card;
+    } else if ( numToBuy == 0 ) {                               // If there was nothing to buy need to delete future
+        try {
+            delete fcard();
+        }
+        catch ( WATCardOffice:: Lost ) {
+        }
     }
 
     _printer.print( Printer::Student, _id, (char)Student::Finished ); // Finished
